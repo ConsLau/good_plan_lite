@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:good_plan_lite/database/database_helper.dart';
-import 'package:good_plan_lite/models/task.dart';  // Added import
-import 'package:good_plan_lite/models/task_category.dart';  // Added import
+import 'package:good_plan_lite/models/task.dart';  
+import 'package:good_plan_lite/models/task_category.dart';
 import 'package:intl/intl.dart';
 
 
@@ -30,7 +30,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         key: _formKey,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: ListView(   // Changed Column to ListView
+          child: ListView(
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(labelText: 'Task Name'),
@@ -75,6 +75,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                   });
                 },
               ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 50.0), // added padding here
+              ),
             ],
           ),
         ),
@@ -86,37 +89,29 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
-void _submitForm() async {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
 
-    // Create your task and task category objects
-    var task = Task(
-      taskName: _taskName,
-      taskDesc: _taskDesc,
-      taskDate: _taskDate,
-      isComplete: _isComplete ? IsComplete.complete : IsComplete.inComplete,  // Update here
-      categoryId: 1,  // Modify as necessary
-    );
+      var task = Task(
+        taskName: _taskName,
+        taskDesc: _taskDesc,
+        taskDate: _taskDate,
+        isComplete: _isComplete ? IsComplete.complete : IsComplete.inComplete,
+        categoryId: 1,
+      );
 
-    var category = TaskCategory(
-      cateName: _cateName,
-    );
+      var category = TaskCategory(
+        cateName: _cateName,
+      );
 
-    // Save your task and category in database and print out the id
-    var taskId = await DatabaseHelper.instance.createTask(task);
-    var categoryId = await DatabaseHelper.instance.createTaskCategory(category);
+      var taskId = await DatabaseHelper.instance.createTask(task);
+      var categoryId = await DatabaseHelper.instance.createTaskCategory(category);
 
-    // Print the task and category ids
-    print('New task id: $taskId');
-    print('New category id: $categoryId');
+      print('New task id: $taskId');
+      print('New category id: $categoryId');
 
-    // Optionally, you can navigate back to the previous screen
-    Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
-}
-
-
-
-
 }

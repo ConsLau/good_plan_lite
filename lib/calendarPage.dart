@@ -96,11 +96,17 @@ class _CalendarPageState extends State<CalendarPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreateTaskPage()),
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (BuildContext context) {
+              return FractionallySizedBox(
+                heightFactor: 0.7, // 70% of screen height
+                child: CreateTaskPage(),
+              );
+            },
           ).then((_) {
-            _fetchTasks();  // Fetch tasks again when returned from CreateTaskPage
+            _fetchTasks(); // Fetch tasks again when returned from CreateTaskPage
           });
         },
         child: Icon(Icons.add),
