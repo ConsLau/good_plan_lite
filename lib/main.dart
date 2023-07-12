@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 86, 169, 175)),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -52,8 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         child: NavigationBar(       
-          height: 60,
-          backgroundColor: Colors.blueGrey.shade300,
+          height: 70,
+          backgroundColor: Colors.grey.shade300,
           selectedIndex: index,
           onDestinationSelected: (index) => setState(() => this.index = index),
           destinations: [

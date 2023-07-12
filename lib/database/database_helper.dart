@@ -68,6 +68,17 @@ class DatabaseHelper {
     );
   }
 
+    Future<int> updateTask(Task task) async {
+    final db = await instance.database;
+
+    return db.update(
+      'tasks',
+      task.toMap(),
+      where: 'id = ?',
+      whereArgs: [task.id],
+    );
+  }
+
   // Add this method to your DatabaseHelper class
 Future<List<Task>> fetchTasksByDate(DateTime date) async {
   final db = await instance.database;

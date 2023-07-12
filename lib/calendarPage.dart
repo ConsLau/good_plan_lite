@@ -76,6 +76,14 @@ class _CalendarPageState extends State<CalendarPage> {
                       ),
                     ),
                     child: ListTile(
+                      leading: InkWell(
+                        onTap: () {
+                          _toggleTaskCompletion(task); // Toggle the task completion status when icon is tapped
+                        },
+                        child: Icon(
+                          task.isComplete == IsComplete.complete ? Icons.check_circle : Icons.check_circle_outline,
+                        ),
+                      ),
                       title: Text(task.taskName!),
                       subtitle: Text(task.taskDesc!),
                     ),
@@ -109,6 +117,14 @@ class _CalendarPageState extends State<CalendarPage> {
 
   void _deleteTask(int id) async {
     await DatabaseHelper.instance.deleteTask(id);
+    _fetchTasks();
+  }
+
+  void _toggleTaskCompletion(Task task) async {
+    Task updatedTask = task.copy(
+      isComplete: task.isComplete == IsComplete.complete ? IsComplete.inComplete : IsComplete.complete,
+    );
+    await DatabaseHelper.instance.updateTask(updatedTask);
     _fetchTasks();
   }
 }
