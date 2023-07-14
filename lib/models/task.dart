@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-enum IsComplete { complete, inComplete }
+enum IsComplete { inComplete, complete }
 
 class Task {
   final int? id;
