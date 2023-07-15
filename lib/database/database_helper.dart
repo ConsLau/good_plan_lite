@@ -205,23 +205,56 @@ Future<int> calculateCompletionPercentageForCurrentWeek() async {
 }
 
 // Fetch tasks completed this month
-  Future<int> fetchTasksCompletedThisMonth() async {
-    final db = await instance.database;
+Future<int> fetchTasksCompletedThisMonth() async {
+  final db = await instance.database;
 
-    final now = DateTime.now();
-    final startOfMonth = DateTime(now.year, now.month, 1);
-    final endOfMonth = DateTime(now.year, now.month + 1, 0);
-    final startString = DateFormat('yyyy-MM-dd').format(startOfMonth);
-    final endString = DateFormat('yyyy-MM-dd').format(endOfMonth);
+  final now = DateTime.now();
+  final startOfMonth = DateTime(now.year, now.month, 1);
+  final endOfMonth = DateTime(now.year, now.month + 1, 0);
+  final startString = DateFormat('yyyy-MM-dd').format(startOfMonth);
+  final endString = DateFormat('yyyy-MM-dd').format(endOfMonth);
 
-    final result = await db.rawQuery('''
+  final result = await db.rawQuery('''
     SELECT COUNT(*) 
     FROM tasks 
     WHERE DATE(taskDate) BETWEEN ? AND ? AND isComplete = 1
   ''', [startString, endString]);
 
-    return Sqflite.firstIntValue(result) ?? 0;
+  return Sqflite.firstIntValue(result) ?? 0;
+}
+
+// Fetch total tasks for this month
+Future<int> fetchTotalTasksThisMonth() async {
+  final db = await instance.database;
+
+  final now = DateTime.now();
+  final startOfMonth = DateTime(now.year, now.month, 1);
+  final endOfMonth = DateTime(now.year, now.month + 1, 0);
+  final startString = DateFormat('yyyy-MM-dd').format(startOfMonth);
+  final endString = DateFormat('yyyy-MM-dd').format(endOfMonth);
+
+  final result = await db.rawQuery('''
+    SELECT COUNT(*) 
+    FROM tasks 
+    WHERE DATE(taskDate) BETWEEN ? AND ?
+  ''', [startString, endString]);
+
+  return Sqflite.firstIntValue(result) ?? 0;
+}
+
+// Calculate the completion percentage for the current month
+Future<int> calculateCompletionPercentageForCurrentMonth() async {
+  int completedTasks = await fetchTasksCompletedThisMonth();
+  int totalTasks = await fetchTotalTasksThisMonth();
+
+  if (totalTasks == 0) {
+    return 0;
   }
+
+  final int percentage = (completedTasks * 100) ~/ totalTasks;  // Percentage
+
+  return percentage;
+}
 
   Stream<int> streamTasksCompletedToday() async* {
     while (true) {
@@ -240,8 +273,31 @@ Future<int> calculateCompletionPercentageForCurrentWeek() async {
   Stream<int> streamTasksCompletedThisMonth() async* {
     while (true) {
       await Future.delayed(Duration(seconds: 1)); // Poll every second
-      yield await fetchTasksCompletedThisMonth();
+      yield await calculateCompletionPercentageForCurrentMonth();
     }
   }
+
+Stream<List<Task>> streamIncompleteTasksStartingToday() async* {
+    final db = await instance.database;
+
+    while (true) {
+      final result = await db.rawQuery('''
+        SELECT * 
+        FROM tasks 
+        WHERE isComplete = 0
+      ''');
+
+      final List<Task> tasks = result.map((map) {
+        print('taskDate from database: ${map['taskDate']}');
+        return Task.fromMap(map);
+      }).toList();
+
+      yield tasks;
+
+      await Future.delayed(Duration(seconds: 1)); // Update every second
+    }
+}
+
+
 
 }

@@ -23,23 +23,38 @@ Map<String, dynamic> toMap() {
   return {
     'id': id,
     'isComplete': isComplete.index,
-    'taskDate': DateFormat('yyyy-MM-dd').format(taskDate),
+    'taskDate': taskDate.millisecondsSinceEpoch,
     'taskDesc': taskDesc,
     'taskName': taskName,
     'categoryId': categoryId,
   };
 }
 
+
 static Task fromMap(Map<String, dynamic> map) {
+  print('taskDate in fromMap: ${map['taskDate']}');
+
+  DateTime taskDate;
+
+  if (map['taskDate'] is int) {
+    taskDate = DateTime.fromMillisecondsSinceEpoch(map['taskDate']);
+  } else if (map['taskDate'] is String) {
+    taskDate = DateTime.parse(map['taskDate']);
+  } else {
+    throw Exception('Unknown format for taskDate');
+  }
+
   return Task(
     id: map['id'],
     isComplete: IsComplete.values[map['isComplete']],
-    taskDate: DateTime.parse(map['taskDate']),
+    taskDate: taskDate,
     taskDesc: map['taskDesc'],
     taskName: map['taskName'],
     categoryId: map['categoryId'],
   );
 }
+
+
 
 
 // copy
