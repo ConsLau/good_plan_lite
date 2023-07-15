@@ -279,4 +279,28 @@ Future<int> calculateCompletionPercentageForCurrentMonth() async {
     }
   }
 
+    Stream<List<Task>> streamIncompleteTasksStartingToday() async* {
+    final db = await instance.database;
+    while (true) {
+      await Future.delayed(Duration(seconds: 1)); // Poll every second
+
+      final today = DateTime.now();
+      final dateString = DateFormat('yyyy-MM-dd').format(today);
+
+      final result = await db.rawQuery('''
+        SELECT * 
+        FROM tasks 
+        WHERE DATE(taskDate) >= ? AND isComplete = 0
+      ''', [dateString]);
+
+      // Convert the List<Map<String, dynamic>> into a List<Task>.
+      final tasks = List.generate(result.length, (i) {
+        return Task.fromMap(result[i]);
+      });
+
+      yield tasks;
+    }
+  }
+
+
 }

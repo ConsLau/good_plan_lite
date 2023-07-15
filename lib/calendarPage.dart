@@ -55,6 +55,13 @@ class _CalendarPageState extends State<CalendarPage> {
                 });
               },
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Today\'s Tasks:',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: _tasks.length,
