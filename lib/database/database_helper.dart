@@ -299,5 +299,14 @@ Stream<List<Task>> streamIncompleteTasksStartingToday() async* {
 }
 
 
+// Add this method to the DatabaseHelper class
+Future<List<Task>> fetchTasks() async {
+  final db = await instance.database;
+  final result = await db.query('tasks');
+  return result.map((map) => Task.fromMap(map)).toList();
+}
+
+
+
 
 }

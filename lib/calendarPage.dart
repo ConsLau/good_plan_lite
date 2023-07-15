@@ -60,33 +60,17 @@ class _CalendarPageState extends State<CalendarPage> {
                 itemCount: _tasks.length,
                 itemBuilder: (context, index) {
                   final task = _tasks[index];
-                  return Dismissible(
-                    key: Key('${task.id}'),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      _deleteTask(task.id!); // Delete the task when dismissed
-                    },
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      color: Colors.red,
+                  return ListTile(
+                    leading: InkWell(
+                      onTap: () {
+                        _toggleTaskCompletion(task); // Toggle the task completion status when icon is tapped
+                      },
                       child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
+                        task.isComplete == IsComplete.complete ? Icons.check_circle : Icons.check_circle_outline,
                       ),
                     ),
-                    child: ListTile(
-                      leading: InkWell(
-                        onTap: () {
-                          _toggleTaskCompletion(task); // Toggle the task completion status when icon is tapped
-                        },
-                        child: Icon(
-                          task.isComplete == IsComplete.complete ? Icons.check_circle : Icons.check_circle_outline,
-                        ),
-                      ),
-                      title: Text(task.taskName!),
-                      subtitle: Text(task.taskDesc!),
-                    ),
+                    title: Text(task.taskName ?? ''), // Add null check for task title
+                    subtitle: Text(task.taskDesc ?? ''), // Add null check for task description
                   );
                 },
               ),
@@ -114,12 +98,15 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _fetchTasks() async {
-    if (_selectedDay != null) {
-      _tasks = await DatabaseHelper.instance.fetchTasksByDate(_selectedDay!);
-      setState(() {});
-    }
+void _fetchTasks() async {
+  if (_selectedDay != null) {
+    final tasks = await DatabaseHelper.instance.fetchTasks();
+    final filteredTasks = tasks?.where((task) => isSameDay(task.taskDate, _selectedDay!)).toList();
+    setState(() {
+      _tasks = filteredTasks ?? [];
+    });
   }
+}
 
   void _deleteTask(int id) async {
     await DatabaseHelper.instance.deleteTask(id);
