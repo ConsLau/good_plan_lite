@@ -33,10 +33,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(   // Replace the previous SizedBox with ListView
+      body: Column(   
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6, // Adjust the height
+            height: MediaQuery.of(context).size.height * 0.6, 
             child: Stack(
               children: [
                 Container(
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         Text(
                           DateFormat.yMMMd()
-                              .format(DateTime.now()), // show current date
+                              .format(DateTime.now()), 
                           style: TextStyle(fontSize: 16),
                         )
                       ],
@@ -136,29 +136,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
-          StreamBuilder<List<Task>>(
+          Expanded( 
+          child: StreamBuilder<List<Task>>(
             stream: dbHelper.streamIncompleteTasksStartingToday(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                final tasks = snapshot.data!;
-                return ListView.builder(
-                  shrinkWrap: true,  // Use this to fit the ListView within another ListView
-                  physics: NeverScrollableScrollPhysics(), // Disable the scrolling of this ListView
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    return ListTile(
-                      title: Text(task.taskName), // Use your actual task fields
-                      subtitle: Text('Due on ${DateFormat('yyyy-MM-dd').format(task.taskDate)}'),
-                    );
-                  },
-                );
-              }
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final tasks = snapshot.data!;
+                  return Container(
+                    height: 300.0,
+                    child: ListView.builder(
+                      itemCount: tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = tasks[index];
+                        return ListTile(
+                          title: Text(
+                              task.taskName), // Use your actual task fields
+                          subtitle: Text(
+                              'Due on ${DateFormat('yyyy-MM-dd').format(task.taskDate)}'),
+                        );
+                      },
+                    ),
+                  );
+                }
             },
+          ),
           ),
         ],
       ),
